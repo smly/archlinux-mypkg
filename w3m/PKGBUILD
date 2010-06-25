@@ -1,6 +1,7 @@
 # $Id: PKGBUILD 75605 2010-04-01 22:56:17Z giovanni $
-# Contributor: dorphell <dorphell@archlinux.org>
-
+# orig: Contributor: dorphell <dorphell@archlinux.org>
+# customized by: smly <eowner+arch@gmail.com>
+ 
 pkgname=w3m
 pkgver=0.5.2
 pkgrel=5
