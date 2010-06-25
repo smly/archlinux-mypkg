@@ -1,0 +1,15 @@
+
+pkgname=nicovideo-dl
+pkgver=0.0.20091209
+pkgrel=1
+pkgdesc="small command-line program to download videos from www.nicovideo.jp"
+arch=('any')
+url="http://sourceforge.jp/projects/nicovideo-dl/"
+license=('MIT')
+source=("http://sourceforge.jp/frs/redir.php?m=auto&f=/$pkgname/44836/$pkgname-$pkgver.tar.gz")
+md5sums=('4c91ace91f2bac8589f9ee060bd1bdd2')
+
+build() {
+cd $pkgname-$pkgver
+install -D -m755 nicovideo-dl $pkgdir/usr/bin/nicovideo-dl
+} 

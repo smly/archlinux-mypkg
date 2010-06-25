@@ -1,0 +1,63 @@
+# Contributor: smly <eowner@gmail.com>
+
+pkgname=bin32-acroread-ja
+pkgver=9.3.2
+pkgrel=1
+pkgdesc="Adobe Acrobat Reader for viewing PDF files. Japanese version"
+arch=('x86_64')
+url="http://www.adobe.com/products/acrobat/main.html"
+license=('custom')
+depends=('rpmextract' 'lib32-libxml2' 'lib32-glibc' 'lib32-gtk2' 'lib32-pcre' 'lib32-libstdc++5' 'lib32-libxdamage' 'bash')
+makedepends=(rpmextract patch)
+install=(nsplugin.install)
+
+source=("http://ardownload.adobe.com/pub/adobe/reader/unix/9.x/${pkgver}/jpn/AdbeRdr${pkgver}-1_i486linux_jpn.rpm" \
+        "http://ardownload.adobe.com/pub/adobe/reader/unix/8.x/8.1.2/misc/FontPack81_jpn_i486-linux.tar.gz" \
+	"acroread-lib32.patch")
+md5sums=('4139fa114b70facd4a86898e31138de5'
+         '56d631775fb7ae3eb7e3247f8f1ca786'
+         '482602dc4128efa85f6db5c6270b4d0e')
+
+build() {
+  cd ${startdir}/src
+  rpmextract.sh AdbeRdr${pkgver}-1_i486linux_jpn.rpm
+  cd opt/Adobe/Reader9
+
+  # Tell acroread to look for gconv libs in our lib32
+  patch -Np3 -i ${startdir}/acroread-lib32.patch || return 1
+
+  mkdir -p ${startdir}/pkg/usr/bin
+  mkdir -p ${startdir}/pkg/usr/share/applications
+  mkdir -p ${startdir}/pkg/usr/share/pixmaps
+  mkdir -p ${startdir}/pkg/opt/acrobat/bin
+    
+  install -D -m644 Resource/Support/AdobeReader.desktop \
+    ${startdir}/pkg/usr/share/applications/AdobeReader.desktop
+  sed -i 's|AdobeReader9.png|AdobeReader9|' \
+    ${startdir}/pkg/usr/share/applications/AdobeReader.desktop
+  install -D -m644 Resource/Icons/64x64/AdobeReader9.png \
+    ${startdir}/pkg/usr/share/pixmaps/AdobeReader9.png
+    
+  install -d ${startdir}/pkg/opt/acrobat
+  cp -r Reader ${startdir}/pkg/opt/acrobat/
+  cp -r Resource ${startdir}/pkg/opt/acrobat/
+
+  install -m755 bin/acroread ${startdir}/pkg/opt/acrobat/bin/
+  ln -sf ../../opt/acrobat/bin/acroread ${startdir}/pkg/usr/bin/acroread
+
+  # Put the plugins where nspluginwrapper can find them
+  install -m755 -D Browser/intellinux/nppdf.so \
+    ${startdir}/pkg/usr/lib/mozilla/plugins/nppdf.so
+
+  install -D -m644 Reader/Legal/en_US/License.txt \
+    ${startdir}/pkg/usr/share/licenses/${pkgname}/License.txt
+
+  find ${startdir}/pkg -type d -exec chmod 755 {} \;
+
+  # langpack
+  cd $pkgdir/opt/acrobat/
+  find $srcdir -name LANG\*.TAR -exec tar -xvf {} \;
+  cp -r Adobe/Reader8/Resource/CIDFont/KozMinProVI-Regular.otf ./Resource/CIDFont/
+  cp -r Adobe/Reader8/Resource/CIDFont/KozGoProVI-Medium.otf ./Resource/CIDFont/
+  rm -r Adobe
+}

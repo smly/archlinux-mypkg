@@ -1,0 +1,15 @@
+post_install() {
+  echo -e '\033[1mRemember to run nspluginwrapper -v -a -i AS USER (not root) to install the 32-bit plugin.\033[0m'
+  echo ">>>--------------"
+}
+
+post_upgrade() {
+  echo -e '\033[1mRemember to run nspluginwrapper -v -a -i AS USER (not root) to install the 32-bit plugin.\033[0m'
+  echo ">>>--------------"
+}
+
+op=$1
+shift
+
+$op $*
+
