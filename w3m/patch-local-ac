@@ -1,0 +1,248 @@
+diff -r f66e5176d63a anchor.c
+--- anchor.c	Sun May 06 20:31:22 2007 +0900
++++ anchor.c	Sun May 06 19:00:27 2007 +0900
+@@ -49,6 +49,7 @@ putAnchor(AnchorList *al, char *url, cha
+     a->slave = FALSE;
+     a->start = bp;
+     a->end = bp;
++	a->no = 0;
+     al->nanchor++;
+     if (anchor_return)
+ 	*anchor_return = a;
+diff -r f66e5176d63a file.c
+--- file.c	Sun May 06 20:31:22 2007 +0900
++++ file.c	Sun May 06 20:22:57 2007 +0900
+@@ -27,6 +27,8 @@
+ #endif				/* not min */
+ 
+ static int frame_source = 0;
++
++int global_anc_no = 0;
+ 
+ static char *guess_filename(char *file);
+ static int _MoveFile(char *path1, char *path2);
+@@ -3308,14 +3310,15 @@ process_img(struct parsed_tag *tag, int 
+ }
+ 
+ Str
+-process_anchor(struct parsed_tag *tag, char *tagbuf)
++process_anchor(struct parsed_tag *tag, char *tagbuf, int no)
+ {
+     if (parsedtag_need_reconstruct(tag)) {
+ 	parsedtag_set_value(tag, ATTR_HSEQ, Sprintf("%d", cur_hseq++)->ptr);
++	parsedtag_set_value(tag, ATTR_NO, Sprintf("%d", no)->ptr);
+ 	return parsedtag2str(tag);
+     }
+     else {
+-	Str tmp = Sprintf("<a hseq=\"%d\"", cur_hseq++);
++	Str tmp = Sprintf("<a hseq=\"%d\" no=\"%d\"", cur_hseq++, no);
+ 	Strcat_charp(tmp, tagbuf + 2);
+ 	return tmp;
+     }
+@@ -4544,8 +4547,12 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 
+ 	if (hseq == 0 && obuf->anchor.url) {
+ 	    obuf->anchor.hseq = cur_hseq;
+-	    tmp = process_anchor(tag, h_env->tagbuf->ptr);
++		obuf->anchor.no = ++global_anc_no;
++	    tmp = process_anchor(tag, h_env->tagbuf->ptr, obuf->anchor.no);
+ 	    push_tag(obuf, tmp->ptr, HTML_A);
++
++		HTMLlineproc1(Sprintf("[%d]", obuf->anchor.no)->ptr, h_env);
++
+ 	    return 1;
+ 	}
+ 	return 0;
+@@ -5156,6 +5163,13 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 					      *t, currentLn(buf), pos);
+ 			a_href->hseq = ((hseq > 0) ? hseq : -hseq) - 1;
+ 			a_href->slave = (hseq > 0) ? FALSE : TRUE;
++			a_href->no = 0;
++			{
++				int no;
++				no = 0;
++				parsedtag_get_value(tag, ATTR_NO, &no);
++				a_href->no = no;
++			}
+ 		    }
+ 		    break;
+ 		case HTML_N_A:
+@@ -6368,6 +6382,8 @@ init_henv(struct html_feed_environ *h_en
+     h_env->envc_real = 0;
+     h_env->title = NULL;
+     h_env->blank_lines = 0;
++
++	obuf->anc_no = 0;
+ }
+ 
+ void
+@@ -6557,6 +6573,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+     }
+ 
+     init_henv(&htmlenv1, &obuf, envs, MAX_ENV_LEVEL, NULL, newBuf->width, 0);
++	global_anc_no = 0;
+ 
+     if (w3m_halfdump)
+ 	htmlenv1.f = stdout;
+diff -r f66e5176d63a fm.h
+--- fm.h	Sun May 06 20:31:22 2007 +0900
++++ fm.h	Sun May 06 20:23:10 2007 +0900
+@@ -382,6 +382,7 @@ typedef struct _anchor {
+ #ifdef USE_IMAGE
+     Image *image;
+ #endif
++	int no;
+ } Anchor;
+ 
+ #define NO_REFERER ((char*)-1)
+@@ -579,6 +580,7 @@ struct readbuffer {
+     int tag_sp;
+     short top_margin;
+     short bottom_margin;
++	int anc_no;
+ };
+ 
+ #define in_bold fontstat[0]
+diff -r f66e5176d63a html.c
+--- html.c	Sun May 06 20:31:22 2007 +0900
++++ html.c	Wed May 02 20:32:36 2007 +0900
+@@ -8,9 +8,9 @@ unsigned char ALST_A[] = {
+ unsigned char ALST_A[] = {
+     ATTR_NAME, ATTR_HREF, ATTR_REL, ATTR_CHARSET, ATTR_TARGET, ATTR_HSEQ,
+     ATTR_REFERER,
+-    ATTR_FRAMENAME, ATTR_TITLE, ATTR_ACCESSKEY, ATTR_CORE
+-};
+-#define MAXA_A		MAXA_CORE + 10
++    ATTR_FRAMENAME, ATTR_TITLE, ATTR_ACCESSKEY, ATTR_NO, ATTR_CORE
++};
++#define MAXA_A		MAXA_CORE + 11
+ unsigned char ALST_P[] = { ATTR_ALIGN, ATTR_CORE };
+ #define MAXA_P		MAXA_CORE + 1
+ unsigned char ALST_UL[] = { ATTR_START, ATTR_TYPE, ATTR_CORE };
+@@ -349,4 +349,5 @@
+     {"selectnumber", VTYPE_NUMBER, AFLG_INT},	/* 72 ATTR_SELECTNUMBER   */
+     {"textareanumber", VTYPE_NUMBER, AFLG_INT},	/* 73 ATTR_TEXTAREANUMBER */
+     {"pre_int", VTYPE_NONE, AFLG_INT},	/* 74 ATTR_PRE_INT      */
++    {"no", VTYPE_NUMBER, AFLG_INT}, /* 75 ATTR_NO */
+ };
+diff -r f66e5176d63a html.h
+--- html.h	Sun May 06 20:31:22 2007 +0900
++++ html.h	Wed May 02 20:07:18 2007 +0900
+@@ -302,8 +302,8 @@
+ #define ATTR_SELECTNUMBER	72
+ #define ATTR_TEXTAREANUMBER	73
+ #define ATTR_PRE_INT		74
+-
+-#define MAX_TAGATTR		75
++#define ATTR_NO			75
++#define MAX_TAGATTR		76	
+ 
+ /* HTML Tag Information Table */
+ 
+diff -r f66e5176d63a keybind.c
+--- keybind.c	Sun May 06 20:31:22 2007 +0900
++++ keybind.c	Tue May 01 21:24:07 2007 +0900
+@@ -31,7 +31,7 @@ unsigned char GlobalKeymap[128] = {
+     /*  X       Y       Z       [       \       ]       ^       _        */
+     nulcmd, nulcmd, ctrCsrH, topA, nulcmd, lastA, linbeg, nulcmd,
+     /*  `       a       b       c       d       e       f       g        */
+-    nulcmd, svA, pgBack, curURL, nulcmd, nulcmd, nulcmd, goLineF,
++    nulcmd, svA, pgBack, curURL, nulcmd, nulcmd, goLink, goLineF,
+     /*  h       i       j       k       l       m       n       o        */
+     movL, peekIMG, movD, movU, movR, msToggle, srchnxt, ldOpt,
+     /*  p       q       r       s       t       u       v       w        */
+diff -r f66e5176d63a main.c
+--- main.c	Sun May 06 20:31:22 2007 +0900
++++ main.c	Sun May 06 19:13:03 2007 +0900
+@@ -6605,3 +6605,41 @@ DEFUN(redoPos, REDO, "Cancel the last un
+     for (i = 0; i < PREC_NUM && b->next; i++, b = b->next) ;
+     resetPos(b);
+ }
++
++DEFUN(goLink, GO_LINK, "Go to specified link")
++{
++    AnchorList *al = Currentbuf->href;
++	Anchor *an;
++	int no;
++	char *p;
++	int i;
++
++    if (Currentbuf->firstLine == NULL)
++		return;
++	if (al == NULL)
++		return;
++
++	p = inputStr("anchor no: ", "");
++	if (p == NULL || *p == '\0' || Currentbuf->currentLine == NULL) {
++		displayBuffer(Currentbuf, B_FORCE_REDRAW);
++		return;
++	}
++	no = atoi(p);
++
++	if (al->nanchor < no || no <= 0) {
++		displayBuffer(Currentbuf, B_FORCE_REDRAW);
++		return;
++	}
++
++	for (i = 0; i < al->nanchor; i++) {
++		if (al->anchors[i].no == no)
++			break;
++	}
++	an = &al->anchors[i];
++
++    gotoLine(Currentbuf, an->start.line);
++    Currentbuf->pos = an->start.pos;
++    arrangeCursor(Currentbuf);
++    displayBuffer(Currentbuf, B_NORMAL);
++	/*disp_message(Sprintf("no=%d pos=%d,%d", no, an->start.pos, an->start.line)->ptr, TRUE);*/
++}
+diff -r f66e5176d63a proto.h
+--- proto.h	Sun May 06 20:31:22 2007 +0900
++++ proto.h	Wed May 02 21:31:27 2007 +0900
+@@ -50,6 +50,7 @@ extern void goLine(void);
+ extern void goLine(void);
+ extern void goLineF(void);
+ extern void goLineL(void);
++extern void goLink(void);
+ extern void linbeg(void);
+ extern void linend(void);
+ extern void editBf(void);
+@@ -201,7 +202,7 @@ extern int getImageSize(ImageCache * cac
+ extern int getImageSize(ImageCache * cache);
+ #endif
+ extern Str process_img(struct parsed_tag *tag, int width);
+-extern Str process_anchor(struct parsed_tag *tag, char *tagbuf);
++extern Str process_anchor(struct parsed_tag *tag, char *tagbuf, int no);
+ extern Str process_input(struct parsed_tag *tag);
+ extern Str process_select(struct parsed_tag *tag);
+ extern Str process_n_select(void);
+diff -r f66e5176d63a table.c
+--- table.c	Sun May 06 20:31:22 2007 +0900
++++ table.c	Sun May 06 20:18:33 2007 +0900
+@@ -2452,6 +2452,7 @@ feed_table_tag(struct table *tbl, char *
+     int i, j, k, v, v0, w, id;
+     Str tok, tmp, anchor;
+     table_attr align, valign;
++	int no;
+ 
+     cmd = tag->tagid;
+ 
+@@ -2933,11 +2934,16 @@ feed_table_tag(struct table *tbl, char *
+ 	i = 0;
+ 	parsedtag_get_value(tag, ATTR_HREF, &anchor);
+ 	parsedtag_get_value(tag, ATTR_HSEQ, &i);
++	no = 0;
++	parsedtag_get_value(tag, ATTR_NO, &no);
+ 	if (anchor) {
+ 	    check_rowcol(tbl, mode);
+ 	    if (i == 0) {
+-		Str tmp = process_anchor(tag, line);
+-		pushdata(tbl, tbl->row, tbl->col, tmp->ptr);
++			extern int global_anc_no;
++			if (no == 0)
++				no = ++global_anc_no;
++		Str tmp = process_anchor(tag, line, no);
++		pushdata(tbl, tbl->row, tbl->col, Sprintf("%s[%d]", tmp->ptr, no)->ptr);
+ 	    }
+ 	    else
+ 		pushdata(tbl, tbl->row, tbl->col, line);

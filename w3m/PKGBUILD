@@ -12,15 +12,20 @@ depends=('openssl' 'gc>=7.0' 'ncurses' 'zlib')
 makedepends=('imlib2')
 optdepends=('imlib2: for graphics support') 
 source=("http://downloads.sourceforge.net/sourceforge/w3m/$pkgname-$pkgver.tar.gz"
+        "patch-local-ac"
         "cookie.c.20100625.diff")
+
 md5sums=('ba06992d3207666ed1bf2dcf7c72bf58'
+         'f4ffc62c3e61558b817e6c99ea7cef4c'
          'c135d4951cc61ec54e91985098a02012')
 sha1sums=('484522547ae6dbb342d3858a2a53a65451e273f9'
+          '567de3d895fcbded959d2b17a6f2f6e3c8995227'
           '2f241d4138ef335f835c6e378ee846acd6ea89f8')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
   patch < ${startdir}/cookie.c.20100625.diff || return 1
+  patch < ${startdir}/patch-local-ac || return 1
   ./configure --prefix=/usr --libexecdir=/usr/lib --enable-ansi-color \
     --disable-mouse --disable-w3mmailer --enable-image=x11,fb \
     --with-imagelib=imlib2 --with-termlib=ncurses || return 1
