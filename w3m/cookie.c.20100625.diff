@@ -1,0 +1,11 @@
+--- cookie.c.orig	2010-06-25 23:56:52.000000000 +0900
++++ cookie.c	2010-06-25 23:57:15.000000000 +0900
+@@ -254,7 +254,7 @@
+ }
+ 
+ char *special_domain[] = {
+-    ".com", ".edu", ".gov", ".mil", ".net", ".org", ".int", NULL
++    ".com", ".edu", ".gov", ".mil", ".net", ".org", ".int", ".nicovideo.jp", NULL
+ };
+ 
+ int
