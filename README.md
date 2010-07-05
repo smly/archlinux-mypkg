@@ -1,6 +1,12 @@
 # archlinux-mypkg
 
-Arch の個人用にカスタマイズしたパッケージ
+aur packages
+
+## bin32-acroread-ja
+
+### japanese font
+
+- 日本語フォントが足りないと怒られるので古いバージョンから取り出す
 
 ## w3m
 
