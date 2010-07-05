@@ -1,6 +1,6 @@
 # archlinux-mypkg
 
-aur packages
+aur uploaded and non-uploaded packages for archlinux
 
 ## bin32-acroread-ja
 
