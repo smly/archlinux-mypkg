@@ -1,7 +1,7 @@
 # Contributor: smly <eowner@gmail.com>
 
 pkgname=bin32-acroread-ja
-pkgver=9.3.3
+pkgver=9.4
 pkgrel=1
 pkgdesc="Adobe Acrobat Reader for viewing PDF files. Japanese version"
 arch=('x86_64')
@@ -11,10 +11,10 @@ depends=('rpmextract' 'lib32-libxml2' 'lib32-glibc' 'lib32-gtk2' 'lib32-pcre' 'l
 makedepends=(rpmextract patch)
 install=(nsplugin.install)
 
-source=("http://ardownload.adobe.com/pub/adobe/reader/unix/9.x/${pkgver}/jpn/AdbeRdr${pkgver}-1_i486linux_jpn.rpm" \
-        "http://ardownload.adobe.com/pub/adobe/reader/unix/8.x/8.1.2/misc/FontPack81_jpn_i486-linux.tar.gz" \
+source=("ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/${pkgver}.0/jpn/AdbeRdr${pkgver}-1_i486linux_jpn.rpm"
+        "ftp://ftp.adobe.com/pub/adobe/reader/unix/8.x/8.1.2/misc/FontPack81_jpn_i486-linux.tar.gz"
 	"acroread-lib32.patch")
-md5sums=('03e3098c3894f7b247a425968ea18b25'
+md5sums=('208eb72b7609d41cc3ebd30d2ce15b51'
          '56d631775fb7ae3eb7e3247f8f1ca786'
          '482602dc4128efa85f6db5c6270b4d0e')
 
