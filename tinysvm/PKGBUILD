@@ -1,0 +1,23 @@
+# Maintainer: smly <eowner at gmail dot com>
+
+pkgname=tinysvm
+pkgver=0.09
+pkgrel=1
+pkgdesc="An implementation of Support Vector Machine (SVMs)"
+arch=(i686 x86_64)
+license=('GPL')
+makedepends=()
+conflicts=(svm_light)
+url="http://chasen.org/~taku/software/TinySVM/"
+source=("http://chasen.org/~taku/software/TinySVM/src/TinySVM-$pkgver.tar.gz")
+md5sums=('22d80bdd94c3c8373062761de0d27fde')
+
+build() {
+    cd $srcdir/TinySVM-$pkgver
+    ./configure --prefix=/usr
+    make || return 1
+    make DESTDIR=$startdir/pkg install
+
+    mkdir -p $pkgdir/usr/share/licenses/$pkgname
+    cp $srcdir/TinySVM-$pkgver/COPYING $pkgdir/usr/share/licenses/$pkgname
+}

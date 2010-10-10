@@ -1,0 +1,26 @@
+# Maintainer: smly <eowner at gmail dot com>
+
+pkgname=bact
+pkgver=0.13
+pkgrel=1
+pkgdesc="A machine learning tool for labeled orderd trees."
+arch=(i686 x86_64)
+license=('GPL')
+depends=(gcc)
+makedepends=()
+conflicts=()
+url="http://chasen.org/~taku/software/bact/"
+source=("http://chasen.org/~taku/software/bact/${pkgname}-${pkgver}.tar.gz")
+md5sums=('635c6466afb4f1f6c19cbc31655279b5')
+
+build() {
+    cd $srcdir/${pkgname}-${pkgver}
+    make || return 1
+
+    mkdir -p $pkgdir/usr/share/licenses/$pkgname
+    install -m644 COPYING $pkgdir/usr/share/licenses/$pkgname
+    mkdir -p $pkgdir/usr/bin
+    install -m755 bact_learn $pkgdir/usr/bin/bact_learn
+    install -m755 bact_classify $pkgdir/usr/bin/bact_classify
+    install -m755 bact_mkmodel $pkgdir/usr/bin/bact_mkmodel
+}
