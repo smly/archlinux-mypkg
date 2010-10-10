@@ -2,6 +2,10 @@
 
 aur uploaded and non-uploaded packages for archlinux
 
+## smlnj
+
+- 110.71-1 => 110.72-1
+
 ## bin32-acroread-ja
 
 ### japanese font
