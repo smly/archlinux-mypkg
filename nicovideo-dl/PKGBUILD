@@ -1,15 +1,15 @@
 # Maintainer: smly <eowner at gmail dot com>
 
 pkgname=nicovideo-dl
-pkgver=0.0.20101127
+pkgver=0.0.20110122
 pkgrel=1
 pkgdesc="A small command-line program to download videos from nicovideo.jp"
 arch=('any')
 url="http://sourceforge.jp/projects/nicovideo-dl/"
 license=('MIT')
 depends=('python2')
-source=("http://sourceforge.jp/frs/redir.php?m=auto&f=/$pkgname/44836/$pkgname-$pkgver.tar.gz")
-md5sums=('d7d423b8bcac9d6a1cb8f3367bf15f17')
+source=("http://sourceforge.jp/frs/redir.php?m=auto&f=/$pkgname/50675/$pkgname-$pkgver.tar.gz")
+md5sums=('6855a2b14cae0b422e724f04b0ddb834')
 
 build() {
   sed -i 's|#!/usr/bin/env python|#!/usr/bin/env python2|' ${pkgname}-${pkgver}/${pkgname}

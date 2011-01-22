@@ -3,7 +3,7 @@
 
 pkgname=mplus-bitmap-fonts
 pkgver=2.2.4
-pkgrel=2
+pkgrel=3
 pkgdesc="M+ Japanese bitmap fonts"
 arch=(i686 x86_64)
 license=('custom')
