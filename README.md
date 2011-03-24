@@ -2,6 +2,11 @@
 
 aur uploaded and non-uploaded packages for archlinux
 
+## nicovideo-dl
+
+- overwrite_option.patch
+-- 上書き保存したくないのでオプション追加
+
 ## smlnj
 
 - 110.71-1 => 110.72-1
