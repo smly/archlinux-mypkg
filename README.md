@@ -2,6 +2,10 @@
 
 PKGBUILDs and patches
 
+## google-glog
+
+- 0.3.0 to 0.3.1
+
 ## howm
 
 - 1.3.8 to 1.3.9.1
