@@ -1,7 +1,7 @@
 # Maintainer: Kohei Ozaki <eow.ner+aur@gmail.com>
 pkgname=google-gflags
 pkgver=1.5
-pkgrel=0
+pkgrel=1
 pkgdesc="Commandline flags module for C++"
 arch=(i686 x86_64)
 license=('BSD3')
