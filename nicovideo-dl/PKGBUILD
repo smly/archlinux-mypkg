@@ -2,7 +2,7 @@
 
 pkgname=nicovideo-dl
 pkgver=0.0.20110208
-pkgrel=1
+pkgrel=2
 pkgdesc="A small command-line program to download videos from nicovideo.jp"
 arch=('any')
 url="http://sourceforge.jp/projects/nicovideo-dl/"

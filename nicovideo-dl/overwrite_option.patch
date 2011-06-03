@@ -1,6 +1,6 @@
---- src/nicovideo-dl-0.0.20110122/nicovideo-dl.orig	2011-03-24 09:27:20.000000000 +0900
-+++ src/nicovideo-dl-0.0.20110122/nicovideo-dl	2011-03-24 09:34:01.000000000 +0900
-@@ -220,6 +220,7 @@
+--- src/nicovideo-dl-0.0.20110208/nicovideo-dl.orig	2011-04-26 04:45:22.000000000 +0900
++++ src/nicovideo-dl-0.0.20110208/nicovideo-dl	2011-06-04 01:31:54.000000000 +0900
+@@ -221,6 +221,7 @@
  cmdl_parser.add_option('-v', '--version', action='version', help='print program version and exit')
  cmdl_parser.add_option('-u', '--username', dest='username', metavar='USERNAME', help='account username')
  cmdl_parser.add_option('-p', '--password', dest='password', metavar='PASSWORD', help='account password')
@@ -8,15 +8,13 @@
  cmdl_parser.add_option('-o', '--output', dest='outfile', metavar='FILE', help='output video file name')
  cmdl_parser.add_option('-q', '--quiet', action='store_true', dest='quiet', help='activates quiet mode')
  cmdl_parser.add_option('-s', '--simulate', action='store_true', dest='simulate', help='do not download video')
-@@ -378,7 +379,10 @@
- 		
+@@ -385,6 +386,9 @@
  		if cmdl_opts.simulate or cmdl_opts.get_url:
  			continue
--		
-+
+ 		
 +		if cmdl_opts.overwrite and os.path.exists(video_filename):
-+			sys.exit('Error: unable to overwrite "%s".' % video_filename)
-+
++			sys.exit('Error: unable to overwrite "%s".' % video_filename)	
++		
  		try:
  			video_file = open(video_filename, 'wb')
  		except (IOError, OSError):
