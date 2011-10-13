@@ -8,7 +8,7 @@ arch=('any')
 url="http://sourceforge.jp/projects/nicovideo-dl/"
 license=('MIT')
 depends=('python2')
-source=("http://iij.dl.sourceforge.jp/nicovideo-dl/51768/$pkgname-$pkgver.tar.gz")
+source=("http://iij.dl.sourceforge.jp/nicovideo-dl/53288/$pkgname-$pkgver.tar.gz")
 md5sums=('01fb443f927efaa0cc68b4b5357f4f18')
 
 build() {
