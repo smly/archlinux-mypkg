@@ -1,0 +1,19 @@
+*** PKGBUILD.origin	2013-01-12 18:24:50.165782074 +0900
+--- PKGBUILD	2013-01-12 14:33:51.193945440 +0900
+***************
+*** 33,39 ****
+    rm -rf "$srcdir/$_gitname-build"
+    git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+    cd "$srcdir/$_gitname-build"
+! 
+    autoreconf --install
+    ./configure --prefix=/usr
+    make Makefile mtrack_drv.la config.h
+--- 33,39 ----
+    rm -rf "$srcdir/$_gitname-build"
+    git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+    cd "$srcdir/$_gitname-build"
+!   mkdir m4
+    autoreconf --install
+    ./configure --prefix=/usr
+    make Makefile mtrack_drv.la config.h
